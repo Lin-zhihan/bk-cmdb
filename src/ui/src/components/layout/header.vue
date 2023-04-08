@@ -219,6 +219,8 @@
     flex: 292px 0 0;
     font-size: 0;
     .logo-link {
+
+
       display: inline-block;
       vertical-align: middle;
       height: 58px;
