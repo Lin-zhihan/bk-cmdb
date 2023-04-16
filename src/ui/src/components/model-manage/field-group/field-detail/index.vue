@@ -38,14 +38,13 @@
         <div class="cmdb-form-item" :class="{ 'is-error': errors.has('fieldName') }">
           <bk-input type="text" class="cmdb-form-input"
             name="fieldName"
-            :placeholder="$t('请输入字段名称')"
+            :placeholder="isSystemCreate ? $t('请输入名称，国际化时将会自动翻译，不可修改') : $t('请输入字段名称')"
             v-model.trim="fieldInfo.bk_property_name"
             :disabled="isReadOnly || isSystemCreate || field.ispre"
             v-validate="'required|length:128'">
           </bk-input>
           <p class="form-error">{{errors.first('fieldName')}}</p>
         </div>
-        <i class="icon-cc-exclamation-tips" v-if="isSystemCreate" tabindex="-1" v-bk-tooltips="$t('国际化配置翻译，不可修改')"></i>
       </label>
       <div class="form-label">
         <span class="label-text">
@@ -111,13 +110,15 @@
           :multiple="fieldInfo.ismultiple"
           v-model="fieldInfo.option"
           :type="fieldInfo.bk_property_type"
+          :default-value="fieldInfo.default"
           ref="component"
+          @getDefaultValue="getDefaultValue"
         ></component>
         <label class="form-label" v-if="isDefaultComponentShow">
           <span class="label-text">
             {{$t('默认值')}}
           </span>
-          <div class="cmdb-form-item" :class="{ 'is-error': errors.has('defalut') }">
+          <div class="cmdb-form-item">
             <component
               name="defalut"
               :key="fieldInfo.bk_property_type"
@@ -125,11 +126,11 @@
               :is="`cmdb-form-${fieldInfo.bk_property_type}`"
               :multiple="fieldInfo.ismultiple"
               :options="fieldInfo.option || []"
+              :disabled="isReadOnly || isSystemCreate || field.ispre"
               v-model="fieldInfo.default"
-              v-validate="$tools.getValidateRules(fieldInfo)"
+              v-validate="getValidateRules(fieldInfo)"
               ref="component"
             ></component>
-            <p class="form-error">{{errors.first('defalut')}}</p>
           </div>
         </label>
       </div>
@@ -296,6 +297,7 @@
           PROPERTY_TYPES.ENUM,
           PROPERTY_TYPES.ENUMMULTI,
           PROPERTY_TYPES.ENUMQUOTE,
+          PROPERTY_TYPES.LIST,
           PROPERTY_TYPES.BOOL
         ]
         return !types.includes(this.fieldInfo.bk_property_type)
@@ -339,6 +341,7 @@
               break
             case PROPERTY_TYPES.OBJUSER:
             case PROPERTY_TYPES.ORGANIZATION:
+              this.fieldInfo.default = ''
               this.fieldInfo.option = ''
               this.fieldInfo.ismultiple = true
               break
@@ -384,6 +387,7 @@
       },
       async saveField() {
         if (!await this.validateValue()) {
+          console.log('校验失败了')
           return
         }
         let fieldId = null
@@ -458,71 +462,79 @@
       },
       cancel() {
         this.$emit('cancel')
+      },
+      getDefaultValue(value) {
+        this.fieldInfo.default = value
+      },
+      getValidateRules(fieldInfo) {
+        const rules =  this.$tools.getValidateRules(fieldInfo)
+        Reflect.deleteProperty(rules, 'required')
+        return rules
       }
     }
   }
 </script>
 
 <style lang="scss" scoped>
-    .model-slider-content {
-        height: 100%;
-        padding: 0;
-        @include scrollbar-y;
-        .slider-main {
-            max-height: calc(100% - 52px);
-            @include scrollbar-y;
-            padding: 20px 20px 0;
-        }
-        .slider-content {
-            /deep/ textarea[disabled] {
-                background-color: #fafbfd!important;
-                cursor: not-allowed;
-            }
-        }
-        .icon-info-circle {
-            font-size: 18px;
-            color: $cmdbBorderColor;
-            padding-left: 5px;
-        }
-        .field-detail {
-            width: 100%;
-            margin-bottom: 20px;
-            padding: 20px;
-            background: #F5F7FB;
-            .form-label:last-child {
-                margin: 0;
-            }
-            .label-text {
-                vertical-align: top;
-            }
-            .cmdb-form-checkbox {
-                width: 90px;
-                line-height: 22px;
-                vertical-align: middle;
-            }
-        }
-        .cmdb-form-item {
-            width: 100%;
-            &.is-error {
-                /deep/ .bk-form-input {
-                    border-color: #ff5656;
-                }
-            }
-        }
-        .icon-cc-exclamation-tips {
-            font-size: 18px;
-            color: #979ba5;
-            margin-left: 10px;
-        }
-        .btn-group {
-            padding: 8px 24px;
-            &.is-sticky {
-                border-top: 1px solid #dcdee5;
-            }
-            .bk-button{
-                width: 88px;
-                height: 32px;
-            }
-        }
+.model-slider-content {
+  height: 100%;
+  padding: 0;
+  @include scrollbar-y;
+  .slider-main {
+    max-height: calc(100% - 52px);
+    @include scrollbar-y;
+    padding: 20px 20px 0;
+  }
+  .slider-content {
+    /deep/ textarea[disabled] {
+      background-color: #fafbfd !important;
+      cursor: not-allowed;
     }
+  }
+  .icon-info-circle {
+    font-size: 18px;
+    color: $cmdbBorderColor;
+    padding-left: 5px;
+  }
+  .field-detail {
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 20px;
+    background: #f5f7fb;
+    .form-label:last-child {
+      margin: 0;
+    }
+    .label-text {
+      vertical-align: top;
+    }
+    .cmdb-form-checkbox {
+      width: 90px;
+      line-height: 22px;
+      vertical-align: middle;
+    }
+  }
+  .cmdb-form-item {
+    width: 100%;
+    &.is-error {
+      /deep/ .bk-form-input {
+        border-color: #ff5656;
+      }
+    }
+  }
+  .icon-cc-exclamation-tips {
+    font-size: 18px;
+    color: #979ba5;
+    margin-left: 10px;
+  }
+  .btn-group {
+    padding: 8px 24px;
+    &.is-sticky {
+      border-top: 1px solid #dcdee5;
+    }
+    .bk-button {
+      width: 88px;
+      height: 32px;
+    }
+  }
+}
 </style>

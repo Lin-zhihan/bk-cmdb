@@ -51,6 +51,26 @@
         </bk-button>
       </li>
     </vue-draggable>
+    <div class="default-setting">
+      <p class="title mb10">{{$t('默认值设置')}}</p>
+      <div class="cmdb-form-item" :class="{ 'is-error': errors.has('defaultValueSelect') }">
+        <bk-select style="width: 100%;"
+          :clearable="false"
+          :disabled="isReadOnly"
+          name="defaultValueSelect"
+          data-vv-validate-on="change"
+          v-validate.immediate="`maxSelectLength:1`"
+          v-model="defaultListValue"
+          @change="handleSettingDefault">
+          <bk-option v-for="option in settingList"
+            :key="option.id"
+            :id="option.id"
+            :name="option.name">
+          </bk-option>
+        </bk-select>
+        <p class="form-error">{{errors.first('defaultValueSelect')}}</p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -68,11 +88,17 @@
       isReadOnly: {
         type: Boolean,
         default: false
-      }
+      },
+      defaultValue: {
+        type: String,
+        default: ''
+      },
     },
     data() {
       return {
         list: [{ name: '' }],
+        settingList: [],
+        defaultListValue: '',
         dragOptions: {
           animation: 300,
           disabled: false,
@@ -86,10 +112,24 @@
     watch: {
       value() {
         this.initValue()
+      },
+      list: {
+        deep: true,
+        handler(value) {
+          this.settingList = (value || []).filter(val => val.name).map((item, index) => ({
+            id: index,
+            name: item.name
+          }))
+        }
       }
     },
     created() {
       this.initValue()
+    },
+    mounted() {
+      if (this.defaultValue) {
+        this.defaultListValue = this.list.findIndex(item => item.name === this.defaultValue)
+      }
     },
     methods: {
       getOtherName(index) {
@@ -140,99 +180,104 @@
 
         const list = this.list.map(item => item.name)
         this.$emit('input', list)
-      }
+      },
+      handleSettingDefault(id) {
+        const defaultValue = this.settingList.find(item => item.id === id).name
+        this.$emit('getDefaultValue', defaultValue)
+      },
     }
   }
 </script>
 
 <style lang="scss" scoped>
-    .title {
-        font-size: 14px;
+.title {
+  font-size: 14px;
+}
+.form-list-wrapper {
+  .form-item {
+    display: flex;
+    align-items: center;
+    position: relative;
+    margin-bottom: 16px;
+    padding: 2px 2px 2px 28px;
+    font-size: 0;
+    cursor: move;
+
+    &:not(:first-child) {
+      margin-top: 16px;
     }
-    .form-list-wrapper {
-        .form-item {
-            display: flex;
-            align-items: center;
-            position: relative;
-            padding: 2px 2px 2px 28px;
-            font-size: 0;
-            cursor: move;
 
-            &:not(:first-child) {
-                margin-top: 16px;
-            }
-
-            &::before {
-                content: '';
-                position: absolute;
-                top: 12px;
-                left: 8px;
-                width: 3px;
-                height: 3px;
-                border-radius: 50%;
-                background-color: #979ba5;
-                box-shadow: 0 5px 0 0 #979ba5,
+    &::before {
+      content: '';
+      position: absolute;
+      top: 12px;
+      left: 8px;
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background-color: #979ba5;
+      box-shadow: 0 5px 0 0 #979ba5,
                     0 10px 0 0 #979ba5,
                     5px 0 0 0 #979ba5,
                     5px 5px 0 0 #979ba5,
                     5px 10px 0 0 #979ba5;
-            }
-
-            .list-name {
-                float: left;
-                width: 200px;
-                input {
-                    width: 100%;
-                }
-            }
-            .list-btn {
-                font-size: 0;
-                color: #c4c6cc;
-                margin: -2px 0 0 6px;
-                .bk-icon {
-                    width: 18px;
-                    height: 18px;
-                    line-height: 18px;
-                    font-size: 18px;
-                    text-align: center;
-                }
-
-                &.is-disabled {
-                    color: #dcdee5;
-                }
-                &:not(.is-disabled):hover {
-                    color: #979ba5;
-                }
-            }
-        }
     }
 
-    .toolbar {
-        display: flex;
-        margin-bottom: 10px;
-        align-items: center;
-        line-height: 20px;
-
-        .sort-icon {
-            width: 20px;
-            height: 20px;
-            margin-left: 10px;
-            border: 1px solid #c4c6cc;
-            background: #fff;
-            border-radius: 2px;
-            font-size: 16px;
-            line-height: 18px;
-            text-align: center;
-            color: #c4c6cc;
-            cursor: pointer;
-
-            &:hover {
-                color: #979ba5;
-            }
-        }
+    .list-name {
+      float: left;
+      width: 200px;
+      input {
+        width: 100%;
+      }
     }
+    .list-btn {
+      font-size: 0;
+      color: #c4c6cc;
+      margin: -2px 0 0 6px;
+      .bk-icon {
+        width: 18px;
+        height: 18px;
+        line-height: 18px;
+        font-size: 18px;
+        text-align: center;
+      }
 
-    .ghost {
-        border: 1px dashed $cmdbBorderFocusColor;
+      &.is-disabled {
+        color: #dcdee5;
+      }
+      &:not(.is-disabled):hover {
+        color: #979ba5;
+      }
     }
+  }
+}
+
+.toolbar {
+  display: flex;
+  margin-bottom: 10px;
+  align-items: center;
+  line-height: 20px;
+
+  .sort-icon {
+    width: 20px;
+    height: 20px;
+    margin-left: 10px;
+    border: 1px solid #c4c6cc;
+    background: #fff;
+    border-radius: 2px;
+    font-size: 16px;
+    line-height: 18px;
+    text-align: center;
+    color: #c4c6cc;
+    cursor: pointer;
+
+    &:hover {
+      color: #979ba5;
+    }
+  }
+}
+
+.ghost {
+  border: 1px dashed $cmdbBorderFocusColor;
+}
 </style>
