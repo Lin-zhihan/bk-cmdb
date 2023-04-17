@@ -118,7 +118,7 @@
           <span class="label-text">
             {{$t('默认值')}}
           </span>
-          <div class="cmdb-form-item" :class="{ 'is-error': errors.has('defalut') }">
+          <div class="cmdb-form-item">
             <component
               name="defalut"
               :key="fieldInfo.bk_property_type"
@@ -131,7 +131,6 @@
               v-validate="getValidateRules(fieldInfo)"
               ref="component"
             ></component>
-            <p class="form-error">{{errors.first('defalut')}}</p>
           </div>
         </label>
       </div>
@@ -388,6 +387,7 @@
       },
       async saveField() {
         if (!await this.validateValue()) {
+          console.log('校验失败了')
           return
         }
         let fieldId = null
@@ -476,65 +476,65 @@
 </script>
 
 <style lang="scss" scoped>
-    .model-slider-content {
-        height: 100%;
-        padding: 0;
-        @include scrollbar-y;
-        .slider-main {
-            max-height: calc(100% - 52px);
-            @include scrollbar-y;
-            padding: 20px 20px 0;
-        }
-        .slider-content {
-            /deep/ textarea[disabled] {
-                background-color: #fafbfd!important;
-                cursor: not-allowed;
-            }
-        }
-        .icon-info-circle {
-            font-size: 18px;
-            color: $cmdbBorderColor;
-            padding-left: 5px;
-        }
-        .field-detail {
-            width: 100%;
-            margin-bottom: 20px;
-            padding: 20px;
-            background: #F5F7FB;
-            .form-label:last-child {
-                margin: 0;
-            }
-            .label-text {
-                vertical-align: top;
-            }
-            .cmdb-form-checkbox {
-                width: 90px;
-                line-height: 22px;
-                vertical-align: middle;
-            }
-        }
-        .cmdb-form-item {
-            width: 100%;
-            &.is-error {
-                /deep/ .bk-form-input {
-                    border-color: #ff5656;
-                }
-            }
-        }
-        .icon-cc-exclamation-tips {
-            font-size: 18px;
-            color: #979ba5;
-            margin-left: 10px;
-        }
-        .btn-group {
-            padding: 8px 24px;
-            &.is-sticky {
-                border-top: 1px solid #dcdee5;
-            }
-            .bk-button{
-                width: 88px;
-                height: 32px;
-            }
-        }
+.model-slider-content {
+  height: 100%;
+  padding: 0;
+  @include scrollbar-y;
+  .slider-main {
+    max-height: calc(100% - 52px);
+    @include scrollbar-y;
+    padding: 20px 20px 0;
+  }
+  .slider-content {
+    /deep/ textarea[disabled] {
+      background-color: #fafbfd !important;
+      cursor: not-allowed;
     }
+  }
+  .icon-info-circle {
+    font-size: 18px;
+    color: $cmdbBorderColor;
+    padding-left: 5px;
+  }
+  .field-detail {
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 20px;
+    background: #f5f7fb;
+    .form-label:last-child {
+      margin: 0;
+    }
+    .label-text {
+      vertical-align: top;
+    }
+    .cmdb-form-checkbox {
+      width: 90px;
+      line-height: 22px;
+      vertical-align: middle;
+    }
+  }
+  .cmdb-form-item {
+    width: 100%;
+    &.is-error {
+      /deep/ .bk-form-input {
+        border-color: #ff5656;
+      }
+    }
+  }
+  .icon-cc-exclamation-tips {
+    font-size: 18px;
+    color: #979ba5;
+    margin-left: 10px;
+  }
+  .btn-group {
+    padding: 8px 24px;
+    &.is-sticky {
+      border-top: 1px solid #dcdee5;
+    }
+    .bk-button {
+      width: 88px;
+      height: 32px;
+    }
+  }
+}
 </style>
