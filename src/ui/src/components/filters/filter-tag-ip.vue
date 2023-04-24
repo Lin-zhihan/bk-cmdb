@@ -103,7 +103,6 @@
             padding-right: 5px;
         }
         .tag-value {
-            max-width: 220px;
             color: #313238;
             @include ellipsis;
         }
