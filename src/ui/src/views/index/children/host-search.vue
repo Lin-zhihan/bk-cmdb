@@ -170,17 +170,17 @@
           const assetSearch = () => this.handleAssetSearch(assetList)
 
           const ipSearch = () => {
-            // 无云区域与有云区域的混合搜索
+            // 无管控区域与有管控区域的混合搜索
             if (IPList.length && IPWithCloudList.length) {
-              return this.$warn(this.$t('暂不支持不同云区域的混合搜索'))
+              return this.$warn(this.$t('暂不支持不同管控区域的混合搜索'))
             }
             // 纯IP搜索
             if (IPList.length) {
               return this.handleIPSearch(IPList)
             }
-            // 不同云区域+IP的混合搜索
+            // 不同管控区域+IP的混合搜索
             if (cloudIdSet.size > 1) {
-              return this.$warn(this.$t('暂不支持不同云区域的混合搜索'))
+              return this.$warn(this.$t('暂不支持不同管控区域的混合搜索'))
             }
             this.handleIPWithCloudSearch(IPWithCloudList, cloudIdSet)
           }

@@ -365,8 +365,8 @@ export function transformIP(raw) {
     const [IP, cloudId] = text.split(':').reverse()
     transformedIP.data.push(IP)
     // 当前的查询接口对于形如 0:ip0  1:ip1 的输入
-    // 拆分后实际的查询结果是云区域id与ip的排列组合形式:0+ip0, 0+ip1, 1+ip0, 1+ip1
-    // 因此实际传入的云区域id不能重复，只用设置一次conditon即可
+    // 拆分后实际的查询结果是管控区域id与ip的排列组合形式:0+ip0, 0+ip1, 1+ip0, 1+ip1
+    // 因此实际传入的管控区域id不能重复，只用设置一次conditon即可
     if (cloudId && !transformedIP.condition) {
       transformedIP.condition = {
         field: 'bk_cloud_id',

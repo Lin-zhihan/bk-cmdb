@@ -56,7 +56,7 @@
                   <div class="ip">
                     {{row.host.bk_host_innerip}}
                     <span class="repeat-tag" v-if="repeatSelected.includes(row)"
-                      v-bk-tooltips="{ content: `${$t('云区域')}：${foreignkey(row.host.bk_cloud_id)}` }">
+                      v-bk-tooltips="{ content: `${$t('管控区域')}：${foreignkey(row.host.bk_cloud_id)}` }">
                       {{$t('IP重复')}}
                     </span>
                   </div>

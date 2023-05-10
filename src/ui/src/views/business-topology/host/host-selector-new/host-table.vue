@@ -44,7 +44,7 @@
           {{row.host.bk_host_innerip}}
         </template>
       </bk-table-column>
-      <bk-table-column :label="$t('云区域')" show-overflow-tooltip>
+      <bk-table-column :label="$t('管控区域')" show-overflow-tooltip>
         <template slot-scope="{ row }">{{row.host.bk_cloud_id | foreignkey}}</template>
       </bk-table-column>
       <cmdb-table-empty
